@@ -3,8 +3,8 @@
   "type": "composer-plugin",
   "description": "Allows you to add Bitrix events without a modules",
   "minimum-stability": "dev",
-  "license": "Apache 2.0",
-  "version": "0.0.4",
+  "license": "MIT",
+  "version": "1.0.0",
   "authors": [
     {
       "name": "Panychev Dmitry",
@@ -17,7 +17,7 @@
     }
   },
   "extra": {
-    "class": "Adv\\BitrixModule\\Plugin"
+    "class": "Adv\\BitrixEventsPlugin\\Plugin"
   },
   "require": {
     "php": "7.0.* || 7.1.* || 7.2.*",

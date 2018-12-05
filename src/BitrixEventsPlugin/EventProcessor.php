@@ -8,6 +8,7 @@ use Bitrix\Main\SystemException;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
+use Composer\Package\PackageInterface;
 
 /**
  * Class EventProcessor
@@ -30,9 +31,19 @@ final class EventProcessor implements ProcessEventInterface
      */
     public function processEvent(PackageEvent $event)
     {
-        $event->getComposer()->getPackage();
+        /**
+         * @var PackageInterface $package
+         */
         $this->setApplication($event);
-        $package = $event->getComposer()->getPackage();
+        $operation = $event->getOperation();
+
+        if (\method_exists($operation, 'getPackage')) {
+            $package = $operation->getPackage();
+        } elseif (\method_exists($operation, 'getInitialPackage')) {
+            $package = $operation->getInitialPackage();
+        } else {
+            return;
+        }
 
         switch ($event->getName()) {
             case PackageEvents::POST_PACKAGE_INSTALL:
@@ -66,6 +77,7 @@ final class EventProcessor implements ProcessEventInterface
     {
         $this->uninstallEvents($packageName);
 
+        $io->write($extras);
         if (!\is_array($extras[Plugin::PACKAGE_NAME][self::EXTRAS_KEY])) {
             return;
         }
@@ -101,6 +113,24 @@ final class EventProcessor implements ProcessEventInterface
     }
 
     /**
+     * @param string $packageName
+     *
+     * @throws SystemException
+     */
+    private function uninstallEvents(string $packageName)
+    {
+        $application = Application::getInstance();
+
+        $application::getConnection()->query(
+            \sprintf(
+                'DELETE FROM b_module_to_module WHERE TO_PATH=\'%s\'',
+                $packageName
+            )
+        );
+        $application->getManagedCache()->clean('b_module_to_module');
+    }
+
+    /**
      * @param bool       $isCompatible
      * @param EventModel $eventModel
      * @param string     $package
@@ -112,28 +142,11 @@ final class EventProcessor implements ProcessEventInterface
         EventManager::getInstance()->{$function}(
             $eventModel->getModule(),
             $eventModel->getEvent(),
-            $package,
+            'main',
             $eventModel->getClass(),
             $eventModel->getMethod(),
-            $eventModel->getSort() ?? 100
+            $eventModel->getSort() ?? 100,
+            $package
         );
-    }
-
-    /**
-     * @param string $packageName
-     *
-     * @throws SystemException
-     */
-    private function uninstallEvents(string $packageName)
-    {
-        $application = Application::getInstance();
-
-        $application::getConnection()->query(
-            \sprintf(
-                'DELETE FROM b_module_to_module WHERE FROM_MODULE_ID=\'%s\'',
-                $packageName
-            )
-        );
-        $application->getManagedCache()->clean('b_module_to_module');
     }
 }

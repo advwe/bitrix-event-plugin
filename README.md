@@ -1,40 +1,36 @@
 Bitrix events plugin
 =====================
 
-Allows you to realize the some capabilities of the 1C-Bitrix module (install/uninstall permanent events)
+Allows you to realize some capabilities of the 1C-Bitrix module (install/uninstall permanent events)
 as a composer library.
-If you want to install your plugin as module or component, please use the composer installer with
-appropriate type (bitrix-d7-module, bitrix-d7-component, bitrix-d7-template)
+If you want to install your package as module, component or template, please use the [composer installer](https://github.com/composer/installers) with
+appropriate type (bitrix-d7-module, bitrix-d7-component, bitrix-d7-template).
+
+Позволяет вам реализовать некоторые возможности модуля 1С-Битрика (такие, как установка/удаление событий)
+в рамках вашего пакета.
+Если вы хотите установить ваш пакет как модуль, компонент, или шаблон, пожалуйста, используйте [composer installer](https://github.com/composer/installers)
+с соответствующим типом (bitrix-d7-module, bitrix-d7-component, bitrix-d7-template).
 
 Installation
 ------------
 
-In the future, to install the latest stable version of this component open a console and execute
-the following command:
+To install the latest stable version of this plugin open a console and execute the following command:
 
 
 ```
 $ composer require adv/bitrix-event-plugin
 ```
 
-Now you can use composer.json 
+Для установки последней стабильной версии просто введите команду:
 
-```json
-{
-  "require": {
-    "adv/bitrix-event-plugin": "*"
-  },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "ssh://git@bitbucket.adv.ru:7999/adv/bitrix-event-plugin.git"
-    }
-  ]
-}
 ```
+$ composer require adv/bitrix-event-plugin
+```
+
 
 Usage
 -------
+
 ```json
 {
     "extra": {
