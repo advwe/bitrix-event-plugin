@@ -21,12 +21,12 @@ trait BitrixCoreFinderTrait
     private static $application;
 
     private $composerExtra = 'bitrix-dir';
-    private $prologPath    = '/bitrix/modules/main/include/prolog.php';
+    private $prologPath    = '/bitrix/modules/main/include/prolog_before.php';
     private $defaults      = [
-        './bitrix',
-        '../../bitrix',
-        'web/bitrix',
-        'common/bitrix',
+        '.',
+        '../..',
+        'web',
+        'common',
     ];
 
     /**
@@ -80,7 +80,7 @@ trait BitrixCoreFinderTrait
         $_SERVER['DOCUMENT_ROOT'] = $GLOBALS['DOCUMENT_ROOT'] = \sprintf(
             '%s/%s/',
             \getcwd(),
-            \preg_replace('~bitrix\?~', '', $documentRoot)
+            \preg_replace('~(bitrix|local)\?~', '', $documentRoot)
         );
 
         /** @noinspection PhpIncludeInspection */
@@ -104,7 +104,7 @@ trait BitrixCoreFinderTrait
                        ->getExtra();
 
         if (!isset($extra['bitrix-dir'])) {
-            $extra['bitrix-dir'] = $this->defaults[0];
+            $extra['bitrix-dir'] = null;
         }
 
         $pathList = \array_merge([\rtrim($extra['bitrix-dir'])], $this->defaults);
@@ -124,12 +124,13 @@ trait BitrixCoreFinderTrait
         while (true) {
             $path =
                 \sprintf(
-                    '/%s/',
+                    '/%s/%s',
                     \trim(
                         $event->getIO()
-                              ->ask("We cant find bitrix in your project. Write you`r absolute bitrix path or press Enter to skip.\n"),
+                              ->ask("We cant find bitrix in your project. Write you`r absolute document root path or press Enter to skip.\n"),
                         " \t\n\r\0\x0B/"
-                    )
+                    ),
+                    $this->prologPath
                 );
 
             if (!$path) {

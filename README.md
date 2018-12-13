@@ -1,3 +1,8 @@
+[![Latest Stable Version](https://poser.pugx.org/adv/bitrix-event-plugin/v/stable)](https://packagist.org/packages/adv/bitrix-event-plugin)
+[![Total Downloads](https://poser.pugx.org/adv/bitrix-event-plugin/downloads)](https://packagist.org/packages/adv/bitrix-event-plugin)
+[![Latest Unstable Version](https://poser.pugx.org/adv/bitrix-event-plugin/v/unstable)](https://packagist.org/packages/adv/bitrix-event-plugin)
+[![License](https://poser.pugx.org/adv/bitrix-event-plugin/license)](https://packagist.org/packages/adv/bitrix-event-plugin)
+
 Bitrix events plugin
 =====================
 
