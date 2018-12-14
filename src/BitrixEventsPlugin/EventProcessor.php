@@ -5,9 +5,11 @@ namespace Adv\BitrixEventsPlugin;
 use Bitrix\Main\Application;
 use Bitrix\Main\EventManager;
 use Bitrix\Main\SystemException;
+use Composer\DependencyResolver\Operation\OperationInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
+use Composer\Package\Package;
 use Composer\Package\PackageInterface;
 
 /**
@@ -25,23 +27,31 @@ final class EventProcessor implements ProcessEventInterface
      * @param PackageEvent $event
      *
      * @throws SystemException
-     * @throws BitrixEventPluginException
      *
      * @return void
      */
     public function processEvent(PackageEvent $event)
     {
+        $package = $this->getPackageFromOperation($event->getOperation());
+
+        if (null === $package) {
+            return;
+        }
+
         /**
          * @var PackageInterface $package
          */
-        $this->setApplication($event);
-        $operation = $event->getOperation();
+        try {
+            $this->setApplication($event);
+        } catch (BitrixEventPluginException $e) {
+            $event->getIO()->write(
+                \sprintf(
+                    'Bitrix is not found. Events from %s was not installed. Please, register it manually.',
+                    $package->getName()
+                ),
+                $event->getIO()::VERY_VERBOSE
+            );
 
-        if (\method_exists($operation, 'getPackage')) {
-            $package = $operation->getPackage();
-        } elseif (\method_exists($operation, 'getInitialPackage')) {
-            $package = $operation->getInitialPackage();
-        } else {
             return;
         }
 
@@ -62,6 +72,24 @@ final class EventProcessor implements ProcessEventInterface
                  * do nothing
                  */
         }
+    }
+
+    /**
+     * @param OperationInterface $operation
+     *
+     * @return Package|null
+     */
+    protected function getPackageFromOperation(OperationInterface $operation)
+    {
+        $package = null;
+
+        if (\method_exists($operation, 'getPackage')) {
+            $package = $operation->getPackage();
+        } elseif (\method_exists($operation, 'getInitialPackage')) {
+            $package = $operation->getInitialPackage();
+        }
+
+        return $package;
     }
 
     /**
