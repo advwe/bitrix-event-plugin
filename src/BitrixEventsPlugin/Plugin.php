@@ -66,9 +66,11 @@ class Plugin implements PluginInterface
         $eventDispatcher->addListener(PackageEvents::POST_PACKAGE_UPDATE, $this->handle(EventTypeRegistry::EVENT_TYPE_UPDATE));
         $eventDispatcher->addListener(PackageEvents::POST_PACKAGE_UNINSTALL, $this->handle(EventTypeRegistry::EVENT_TYPE_DELETE));
         /**
-         * Events manitpulations - after autoloading
+         * Events manitpulations - after autoloading.
+         * Update is not forced autoloading - it's run after a update
          */
         $eventDispatcher->addListener(ScriptEvents::POST_AUTOLOAD_DUMP, $this->processEvents());
+        $eventDispatcher->addListener(ScriptEvents::POST_UPDATE_CMD, $this->processEvents());
     }
 
     /**
