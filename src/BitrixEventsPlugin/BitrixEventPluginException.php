@@ -2,14 +2,12 @@
 
 namespace Adv\BitrixEventsPlugin;
 
-use Exception;
-
 /**
- * Class BitrixModuleException
+ * Interface BitrixEventPluginException
  *
  * @package Adv\BitrixEventsPlugin
  */
-class BitrixEventPluginException extends Exception
+interface BitrixEventPluginException extends \Throwable
 {
 
 }

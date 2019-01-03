@@ -21,17 +21,15 @@ Installation
 
 To install the latest stable version of this plugin open a console and execute the following command:
 
-
-```
+```bash
 $ composer require adv/bitrix-event-plugin
 ```
 
 Для установки последней стабильной версии просто введите команду:
 
-```
+```bash
 $ composer require adv/bitrix-event-plugin
 ```
-
 
 Usage
 -------
@@ -49,7 +47,7 @@ Usage
                     "sort":100,
                     "version":1
                 }
-            },
+            }
         }
     }
 }
@@ -68,7 +66,6 @@ Also, in base required you should define bitrix document root directory:
 License
 -------
 This component is under the MIT license. See the complete license in the [LICENSE] file.
-
 
 Reporting an issue or a feature request
 ---------------------------------------

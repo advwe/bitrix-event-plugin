@@ -1,55 +1,33 @@
 <?php
 
-namespace Adv\BitrixEventsPlugin;
+namespace Adv\BitrixEventsPlugin\Event;
 
 /**
  * Class EventModel
  *
- * @package Adv\BitrixEventsPlugin
+ * @package Adv\BitrixEventsPlugin\Event
  */
 class EventModel
 {
     const VERSION_COMPATIBLE = 1;
 
-    const EVENT_KEY   = 'event';
-    const MODULE_KEY  = 'module';
-    const CLASS_KEY   = 'class';
-    const METHOD_KEY  = 'method';
-    const SORT_KEY    = 'sort';
+    const EVENT_KEY = 'event';
+    const MODULE_KEY = 'module';
+    const CLASS_KEY = 'class';
+    const METHOD_KEY = 'method';
+    const SORT_KEY = 'sort';
     const VERSION_KEY = 'version';
+    const PACKAGE_KEY = 'package';
 
-    protected $event   = '';
-    protected $module  = '';
-    protected $class   = '';
-    protected $method  = '';
-    protected $sort    = 0;
+    protected $event = '';
+    protected $module = '';
+    protected $class = '';
+    protected $method = '';
+    protected $sort = 0;
     protected $version = 1;
-
-    /**
-     * @param array $eventArray
-     *
-     * @return EventModel
-     *
-     * @throws BitrixEventPluginException
-     */
-    public static function factory(array $eventArray): EventModel
-    {
-        if (
-            !$eventArray[self::EVENT_KEY]
-            || !$eventArray[self::MODULE_KEY]
-            || !$eventArray[self::CLASS_KEY]
-            || !$eventArray[self::METHOD_KEY]
-        ) {
-            throw new BitrixEventPluginException('Event is wrong');
-        }
-
-        return (new static())->setEvent((string)$eventArray[self::EVENT_KEY])
-                             ->setModule((string)$eventArray[self::MODULE_KEY])
-                             ->setClass((string)$eventArray[self::CLASS_KEY])
-                             ->setMethod((string)$eventArray[self::METHOD_KEY])
-                             ->setSort((int)$eventArray[self::SORT_KEY])
-                             ->setVersion((int)$eventArray[self::VERSION_KEY]);
-    }
+    protected $type = '';
+    protected $package = '';
+    protected $name = '';
 
     /**
      * @return string
@@ -167,6 +145,66 @@ class EventModel
     public function setVersion(int $version): EventModel
     {
         $this->version = $version;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return EventModel
+     */
+    public function setType(string $type): EventModel
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPackage(): string
+    {
+        return $this->package;
+    }
+
+    /**
+     * @param string $package
+     *
+     * @return EventModel
+     */
+    public function setPackage(string $package): EventModel
+    {
+        $this->package = $package;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return EventModel
+     */
+    public function setName(string $name): EventModel
+    {
+        $this->name = $name;
 
         return $this;
     }
