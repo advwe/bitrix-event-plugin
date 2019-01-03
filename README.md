@@ -1,4 +1,5 @@
 [![Latest Stable Version](https://poser.pugx.org/adv/bitrix-event-plugin/v/stable)](https://packagist.org/packages/adv/bitrix-event-plugin)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6efd39ab17a04c1fbe8335ed997777d6)](https://www.codacy.com/app/ADV_WE/bitrix-event-plugin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=advwe/bitrix-event-plugin&amp;utm_campaign=Badge_Grade)
 [![Total Downloads](https://poser.pugx.org/adv/bitrix-event-plugin/downloads)](https://packagist.org/packages/adv/bitrix-event-plugin)
 [![Latest Unstable Version](https://poser.pugx.org/adv/bitrix-event-plugin/v/unstable)](https://packagist.org/packages/adv/bitrix-event-plugin)
 [![License](https://poser.pugx.org/adv/bitrix-event-plugin/license)](https://packagist.org/packages/adv/bitrix-event-plugin)
@@ -65,7 +66,7 @@ Also, in base required you should define bitrix document root directory:
 
 License
 -------
-This component is under the MIT license. See the complete license in the [LICENSE] file.
+This component is under the MIT license. See the complete license in the [LICENSE](./LICENSE) file.
 
 Reporting an issue or a feature request
 ---------------------------------------
