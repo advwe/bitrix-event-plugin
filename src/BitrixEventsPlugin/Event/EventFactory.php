@@ -72,6 +72,9 @@ final class EventFactory
      */
     protected function buildEventsFromPackage(string $package, array $extra): \Generator
     {
+        $extra[Plugin::PACKAGE_NAME] = $extra[Plugin::PACKAGE_NAME] ?? [];
+        $extra[Plugin::PACKAGE_NAME][self::EXTRAS_KEY] = $extra[Plugin::PACKAGE_NAME][self::EXTRAS_KEY] ?? [];
+
         foreach ($extra[Plugin::PACKAGE_NAME][self::EXTRAS_KEY] as $name => $event) {
             yield $this->buildEvent(
                 \array_merge(
