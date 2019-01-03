@@ -2,11 +2,16 @@
 
 namespace Adv\BitrixEventsPlugin;
 
+use Adv\BitrixEventsPlugin\Event\EventFactory;
+use Adv\BitrixEventsPlugin\Event\EventProcessor;
+use Adv\BitrixEventsPlugin\Event\EventTypeRegistry;
 use Composer\Composer;
+use Composer\EventDispatcher\Event;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
+use Composer\Script\ScriptEvents;
 use Exception;
 
 /**
@@ -24,17 +29,27 @@ class Plugin implements PluginInterface
      * @var EventProcessor
      */
     private $eventProcessor;
+    /**
+     * @var EventFactory
+     */
+    private $eventFactory;
+    /**
+     * @var EventTypeRegistry
+     */
+    private $eventTypeRegistry;
 
     /**
      * Plugin constructor.
      */
     public function __construct()
     {
-        $this->eventProcessor = new EventProcessor();
+        $this->eventFactory = new EventFactory();
+        $this->eventTypeRegistry = new EventTypeRegistry();
+        $this->eventProcessor = new EventProcessor($this->eventTypeRegistry);
     }
 
     /**
-     * @param Composer    $composer
+     * @param Composer $composer
      * @param IOInterface $io
      *
      * @throws Exception
@@ -42,20 +57,45 @@ class Plugin implements PluginInterface
     public function activate(Composer $composer, IOInterface $io)
     {
         $eventDispatcher = $composer->getEventDispatcher();
-        $eventDispatcher->addListener(PackageEvents::POST_PACKAGE_INSTALL, $this->handle());
-        $eventDispatcher->addListener(PackageEvents::POST_PACKAGE_UPDATE, $this->handle());
-        $eventDispatcher->addListener(PackageEvents::POST_PACKAGE_UNINSTALL, $this->handle());
+        $this->eventProcessor->setIo($io);
+
+        /**
+         * Package watchers. Extract events from packages.
+         */
+        $eventDispatcher->addListener(PackageEvents::POST_PACKAGE_INSTALL, $this->handle(EventTypeRegistry::EVENT_TYPE_INSTALL));
+        $eventDispatcher->addListener(PackageEvents::POST_PACKAGE_UPDATE, $this->handle(EventTypeRegistry::EVENT_TYPE_UPDATE));
+        $eventDispatcher->addListener(PackageEvents::POST_PACKAGE_UNINSTALL, $this->handle(EventTypeRegistry::EVENT_TYPE_DELETE));
+        /**
+         * Events manitpulations - after autoloading
+         */
+        $eventDispatcher->addListener(ScriptEvents::POST_AUTOLOAD_DUMP, $this->processEvents());
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return callable
+     */
+    protected function handle(string $type): callable
+    {
+        return function (PackageEvent $event) use ($type) {
+            $this->eventFactory->registerEvent($event, $this->eventTypeRegistry->get($type));
+        };
     }
 
     /**
      * @return callable
-     *
-     * @throws Exception
      */
-    protected function handle(): callable
+    protected function processEvents(): callable
     {
-        return function (PackageEvent $event) {
-            $this->eventProcessor->processEvent($event);
+        return function (Event $event) {
+            $extras = $event->getComposer()->getPackage()->getExtra();
+
+            if ($extras['bitrix-dir']) {
+                $this->eventProcessor->getBitrixFinder()->unshiftDefaultPath($extras['bitrix-dir']);
+            }
+
+            $this->eventProcessor->process();
         };
     }
 }

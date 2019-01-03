@@ -4,25 +4,27 @@ namespace Adv\BitrixEventsPlugin;
 
 use Bitrix\Main\Application;
 use Bitrix\Main\SystemException;
-use Composer\Installer\PackageEvent;
+use Composer\IO\IOInterface;
 use RuntimeException;
 use Throwable;
 
 /**
- * Trait BitrixCoreFinderTrait
+ * Class BitrixCoreFinder
  *
  * @package Adv\BitrixEventsPlugin
  */
-trait BitrixCoreFinderTrait
+final class BitrixCoreFinder
 {
     /**
      * @var Application
      */
-    private static $application;
-
-    private $composerExtra = 'bitrix-dir';
-    private $prologPath    = '/bitrix/modules/main/include/prolog_before.php';
-    private $defaults      = [
+    private $application;
+    /**
+     * @var IOInterface $io
+     */
+    private $io;
+    private $prologPath = '/bitrix/modules/main/include/prolog_before.php';
+    private $defaults = [
         '.',
         '../..',
         'web',
@@ -30,35 +32,43 @@ trait BitrixCoreFinderTrait
     ];
 
     /**
-     * @param PackageEvent $event
-     *
      * @return Application
      *
-     * @throws BitrixEventPluginException
+     * @throws BitrixException
      */
-    public function getApplication(PackageEvent $event): Application
+    public function getApplication(): Application
     {
-        if (!$this::$application) {
-            $this->includeBitrix($event);
+        if (!$this->application) {
+            $this->includeBitrix();
         }
 
-        return $this::$application;
+        return $this->application;
     }
 
     /**
-     * @param PackageEvent $event
-     *
-     * @throws BitrixEventPluginException
+     * @throws BitrixException
      */
-    public function includeBitrix(PackageEvent $event)
+    public function setApplication()
+    {
+        if (!$this->application) {
+            $this->includeBitrix();
+        }
+    }
+
+    /**
+     * @throws BitrixException
+     */
+    private function includeBitrix()
     {
         try {
-            self::$application = Application::getInstance();
+            $this->application = Application::getInstance();
         } catch (Throwable $e) {
             try {
-                $this->includeBitrixFromDocumentRoot($this->findBitrixCorePath($event));
+                $this->includeBitrixFromDocumentRoot($this->findBitrixCorePath());
             } catch (Throwable $e) {
-                throw new BitrixEventPluginException('Wrong document root or bitrix is not found.');
+                var_dump($e->getMessage());
+
+                throw new BitrixException('Wrong document root or bitrix is not found.');
             }
         }
     }
@@ -68,7 +78,7 @@ trait BitrixCoreFinderTrait
      *
      * @throws SystemException
      */
-    public function includeBitrixFromDocumentRoot(string $documentRoot)
+    private function includeBitrixFromDocumentRoot(string $documentRoot)
     {
         \define('NO_KEEP_STATISTIC', 'Y');
         \define('NOT_CHECK_PERMISSIONS', true);
@@ -86,36 +96,18 @@ trait BitrixCoreFinderTrait
         /** @noinspection PhpIncludeInspection */
         require_once \sprintf('%s%s', $documentRoot, $this->prologPath);
 
-        self::$application = Application::getInstance();
+        $this->application = Application::getInstance();
     }
 
     /**
-     * @param PackageEvent $event
-     *
      * @return string
      *
      * @throws RuntimeException
-     * @throws BitrixEventPluginException
+     * @throws BitrixException
      */
-    protected function findBitrixCorePath(PackageEvent $event): string
+    private function findBitrixCorePath(): string
     {
-        $extra = $event->getComposer()
-                       ->getPackage()
-                       ->getExtra();
-
-        if (!isset($extra['bitrix-dir'])) {
-            $extra['bitrix-dir'] = null;
-        }
-
-        $pathList = \array_merge([\rtrim($extra['bitrix-dir'])], $this->defaults);
-
-        foreach ($pathList as $path) {
-            if (!$path) {
-                $event->getIO()->writeError('Extras in bitrix-dir is not defined; try a default paths.');
-
-                continue;
-            }
-
+        foreach ($this->defaults as $path) {
             if ($this->tryPath($this->normalizePath($path))) {
                 return $path;
             }
@@ -126,8 +118,7 @@ trait BitrixCoreFinderTrait
                 \sprintf(
                     '/%s/%s',
                     \trim(
-                        $event->getIO()
-                              ->ask("We cant find bitrix in your project. Write you`r absolute document root path or press Enter to skip.\n"),
+                        $this->io->ask("We cant find bitrix in your project. Write you`r absolute document root path or press Enter to skip.\n"),
                         " \t\n\r\0\x0B/"
                     ),
                     $this->prologPath
@@ -142,7 +133,7 @@ trait BitrixCoreFinderTrait
             }
         }
 
-        throw new BitrixEventPluginException('Wrong document root or bitrix is not found.');
+        throw new BitrixException('Wrong document root or bitrix is not found.');
     }
 
     /**
@@ -150,7 +141,7 @@ trait BitrixCoreFinderTrait
      *
      * @return bool
      */
-    protected function tryPath(string $path): bool
+    private function tryPath(string $path): bool
     {
         return \file_exists($path);
     }
@@ -166,14 +157,20 @@ trait BitrixCoreFinderTrait
     }
 
     /**
-     * @param PackageEvent $event
+     * Add a custom path to default pathes
      *
-     * @throws BitrixEventPluginException
+     * @param string $path
      */
-    public function setApplication(PackageEvent $event)
+    public function unshiftDefaultPath(string $path)
     {
-        if (!$this::$application) {
-            $this->includeBitrix($event);
-        }
+        \array_unshift($this->defaults, \rtrim($path));
+    }
+
+    /**
+     * @param IOInterface $io
+     */
+    public function setIo(IOInterface $io)
+    {
+        $this->io = $io;
     }
 }
