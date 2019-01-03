@@ -24,7 +24,7 @@ final class EventFactory
     {
         $package = $this->getPackageFromOperation($event->getOperation());
 
-        if (null === $package) {
+        if (null === $package || !$this->checkPackageToHasEvent($package)) {
             return;
         }
 
@@ -72,9 +72,6 @@ final class EventFactory
      */
     protected function buildEventsFromPackage(string $package, array $extra): \Generator
     {
-        $extra[Plugin::PACKAGE_NAME] = $extra[Plugin::PACKAGE_NAME] ?? [];
-        $extra[Plugin::PACKAGE_NAME][self::EXTRAS_KEY] = $extra[Plugin::PACKAGE_NAME][self::EXTRAS_KEY] ?? [];
-
         foreach ($extra[Plugin::PACKAGE_NAME][self::EXTRAS_KEY] as $name => $event) {
             yield $this->buildEvent(
                 \array_merge(
@@ -86,6 +83,16 @@ final class EventFactory
                 )
             );
         }
+    }
+
+    /**
+     * @param Package $package
+     *
+     * @return bool
+     */
+    public function checkPackageToHasEvent(Package $package): bool
+    {
+        return $package->getExtra()[Plugin::PACKAGE_NAME] && $package->getExtra()[Plugin::PACKAGE_NAME][self::EXTRAS_KEY];
     }
 
     /**
