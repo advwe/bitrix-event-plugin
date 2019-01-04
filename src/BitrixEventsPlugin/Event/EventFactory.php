@@ -92,7 +92,7 @@ final class EventFactory
      */
     public function checkPackageToHasEvent(Package $package): bool
     {
-        return $package->getExtra()[Plugin::PACKAGE_NAME] ?? false && $package->getExtra()[Plugin::PACKAGE_NAME][self::EXTRAS_KEY] ?? false;
+        return (bool)($package->getExtra()[Plugin::PACKAGE_NAME] ?? false && $package->getExtra()[Plugin::PACKAGE_NAME][self::EXTRAS_KEY] ?? false);
     }
 
     /**
