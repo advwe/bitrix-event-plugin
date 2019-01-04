@@ -93,7 +93,7 @@ class Plugin implements PluginInterface
         return function (Event $event) {
             $extras = $event->getComposer()->getPackage()->getExtra();
 
-            if (null !== $extras['bitrix-dir']) {
+            if (isset($extras['bitrix-dir'])) {
                 $this->eventProcessor->getBitrixFinder()->unshiftDefaultPath($extras['bitrix-dir']);
             }
 
