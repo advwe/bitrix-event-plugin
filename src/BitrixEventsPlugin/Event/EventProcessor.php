@@ -39,6 +39,10 @@ final class EventProcessor implements ProcessEventInterface
     {
         $this->registry = $registry;
         $this->bitrixFinder = new BitrixCoreFinder();
+        /**
+         * @todo remove dirty hack
+         */
+        (new EventModel());
     }
 
     /**
