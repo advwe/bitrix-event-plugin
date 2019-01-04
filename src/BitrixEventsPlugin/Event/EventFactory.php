@@ -41,6 +41,10 @@ final class EventFactory
             );
         }
 
+        if ($registry->getType() === EventTypeRegistry::EVENT_TYPE_DELETE) {
+            return;
+        }
+
         foreach ($this->buildEventsFromPackage($package->getName(), $package->getExtra()) as $event) {
             $registry->register($event);
         }

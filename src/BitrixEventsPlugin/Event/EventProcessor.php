@@ -109,6 +109,9 @@ final class EventProcessor implements ProcessEventInterface
              * @todo update with diff
              */
             case EventTypeRegistry::EVENT_TYPE_UPDATE:
+                $this->uninstallEvents($eventModel->getPackage());
+                $this->installEvent($eventModel);
+                break;
             case EventTypeRegistry::EVENT_TYPE_INSTALL:
                 $this->installEvent($eventModel);
                 break;
@@ -140,6 +143,13 @@ final class EventProcessor implements ProcessEventInterface
             )
         );
         $application->getManagedCache()->clean('b_module_to_module');
+
+        $this->io->write(
+            \sprintf(
+                '<info>Events to package <comment>%s</comment> successfully removed.</info>',
+                $packageName
+            )
+        );
     }
 
     /**
@@ -149,6 +159,14 @@ final class EventProcessor implements ProcessEventInterface
     {
         try {
             $this->registerEvent($event);
+
+            $this->io->write(
+                \sprintf(
+                    '<info>Event <comment>%s</comment> to package <comment>%s</comment> successfully installed.</info>',
+                    $event->getName(),
+                    $event->getPackage()
+                )
+            );
         } catch (\Throwable $e) {
             $this->io->writeError(
                 \sprintf(

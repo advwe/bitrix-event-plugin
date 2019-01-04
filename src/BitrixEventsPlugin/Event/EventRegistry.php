@@ -39,7 +39,11 @@ class EventRegistry
      */
     public function register(EventModel $event)
     {
-        $this->collection->add($event->setType($this->type));
+        $event->setType($this->type);
+
+        if (!$this->collection->contains($event)) {
+            $this->collection->add($event);
+        }
 
         return $this;
     }
