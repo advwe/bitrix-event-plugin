@@ -151,7 +151,16 @@ final class BitrixCoreFinder
      */
     private function normalizePath(string $path): string
     {
-        return \realpath(\sprintf('%s%s%s%s%s', \getcwd(), DIRECTORY_SEPARATOR, $path, DIRECTORY_SEPARATOR, $this->prologPath)) ?: '';
+        return \realpath(
+            \implode (
+                \DIRECTORY_SEPARATOR,
+                [
+                    \getcwd(),
+                    $path,
+                    $this->prologPath
+                ]
+            )
+        ) ?: '';
     }
 
     /**

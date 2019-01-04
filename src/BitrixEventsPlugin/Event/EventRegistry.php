@@ -39,11 +39,7 @@ class EventRegistry
      */
     public function register(EventModel $event)
     {
-        $event->setType($this->type);
-
-        if (!$this->collection->contains($event)) {
-            $this->collection->add($event);
-        }
+        $this->collection->set($this->getEventKey($event), $event->setType($this->type));
 
         return $this;
     }
@@ -72,5 +68,15 @@ class EventRegistry
     public function getType(): string
     {
         return $this->type;
+    }
+
+    /**
+     * @param EventModel $event
+     *
+     * @return string
+     */
+    private function getEventKey(EventModel $event)
+    {
+        return $event->getPackage() . $event->getName();
     }
 }

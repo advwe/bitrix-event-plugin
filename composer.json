@@ -1,7 +1,7 @@
 {
   "name": "adv/bitrix-event-plugin",
   "type": "composer-plugin",
-  "description": "Allows you to add Bitrix events without a modules",
+  "description": "Allows you to add Bitrix events without modules",
   "minimum-stability": "stable",
   "license": "MIT",
   "authors": [

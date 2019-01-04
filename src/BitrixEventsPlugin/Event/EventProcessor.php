@@ -29,6 +29,10 @@ final class EventProcessor implements ProcessEventInterface
      * @var BitrixCoreFinder
      */
     private $bitrixFinder;
+    /**
+     * @var bool
+     */
+    private $isProcessed = false;
 
     /**
      * EventProcessor constructor.
@@ -59,12 +63,18 @@ final class EventProcessor implements ProcessEventInterface
      */
     public function process()
     {
+        if ($this->isProcessed) {
+            return;
+        }
+
         try {
             $this->getBitrixFinder()->setApplication();
 
             foreach ($this->registry->generator() as $eventModel) {
                 $this->dispatchEventProcessing($eventModel);
             }
+
+            $this->isProcessed = true;
         } catch (\Throwable $e) {
             $this->io->writeError(
                 \sprintf(
