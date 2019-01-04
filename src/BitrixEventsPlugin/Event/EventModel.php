@@ -18,6 +18,7 @@ class EventModel
     const SORT_KEY = 'sort';
     const VERSION_KEY = 'version';
     const PACKAGE_KEY = 'package';
+    const NAME_KEY = 'name';
 
     protected $event = '';
     protected $module = '';

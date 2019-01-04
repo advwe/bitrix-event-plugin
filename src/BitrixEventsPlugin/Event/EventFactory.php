@@ -92,7 +92,7 @@ final class EventFactory
      */
     public function checkPackageToHasEvent(Package $package): bool
     {
-        return $package->getExtra()[Plugin::PACKAGE_NAME] && $package->getExtra()[Plugin::PACKAGE_NAME][self::EXTRAS_KEY];
+        return $package->getExtra()[Plugin::PACKAGE_NAME] ?? false && $package->getExtra()[Plugin::PACKAGE_NAME][self::EXTRAS_KEY] ?? false;
     }
 
     /**
@@ -111,7 +111,7 @@ final class EventFactory
             throw new EventCreateException(
                 \sprintf(
                     'Event %s from %s is wrong',
-                    $fields['name'],
+                    $fields[EventModel::NAME_KEY],
                     $fields[EventModel::PACKAGE_KEY]
                 )
             );
@@ -125,6 +125,6 @@ final class EventFactory
             ->setSort((int)$fields[EventModel::SORT_KEY])
             ->setVersion((int)$fields[EventModel::VERSION_KEY])
             ->setPackage((string)$fields[EventModel::PACKAGE_KEY])
-            ->setName($fields['name']);
+            ->setName((string)$fields[EventModel::NAME_KEY]);
     }
 }
