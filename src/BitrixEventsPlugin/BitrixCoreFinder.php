@@ -24,7 +24,7 @@ final class BitrixCoreFinder
      */
     private $io;
     private $prologPath = '/bitrix/modules/main/include/prolog_before.php';
-    private $defaults = [
+    private $defaults   = [
         '.',
         '../..',
         'web',
@@ -66,7 +66,7 @@ final class BitrixCoreFinder
             try {
                 $this->includeBitrixFromDocumentRoot($this->findBitrixCorePath());
             } catch (Throwable $e) {
-                throw new BitrixException('Wrong document root or bitrix is not found.');
+                throw new BitrixException('Wrong document root or bitrix is not found.', $e->getCode(), $e);
             }
         }
     }
@@ -85,11 +85,13 @@ final class BitrixCoreFinder
         \define('BX_WITH_ON_AFTER_EPILOG', false);
         \define('BX_NO_ACCELERATOR_RESET', true);
 
-        $_SERVER['DOCUMENT_ROOT'] = $GLOBALS['DOCUMENT_ROOT'] = \sprintf(
+        $documentRoot = \sprintf(
             '%s/%s/',
             \getcwd(),
             \preg_replace('~(bitrix|local)\?~', '', $documentRoot)
         );
+        $_SERVER['DOCUMENT_ROOT'] = $documentRoot;
+        $GLOBALS['DOCUMENT_ROOT'] = $documentRoot;
 
         /** @noinspection PhpIncludeInspection */
         require_once \sprintf('%s%s', $documentRoot, $this->prologPath);
@@ -152,7 +154,7 @@ final class BitrixCoreFinder
     private function normalizePath(string $path): string
     {
         return \realpath(
-            \implode (
+            \implode(
                 \DIRECTORY_SEPARATOR,
                 [
                     \getcwd(),
