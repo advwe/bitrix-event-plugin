@@ -33,6 +33,10 @@ final class EventProcessor implements ProcessEventInterface
      * @var bool
      */
     private $isProcessed = false;
+    /**
+     * @var array
+     */
+    private $packagesWithUninstalledEvents = [];
 
     /**
      * EventProcessor constructor.
@@ -123,7 +127,10 @@ final class EventProcessor implements ProcessEventInterface
              * @todo update with diff
              */
             case EventTypeRegistry::EVENT_TYPE_UPDATE:
-                $this->uninstallEvents($eventModel->getPackage());
+                if(!isset($this->packagesWithUninstalledEvents[$eventModel->getPackage()])){
+                    $this->uninstallEvents($eventModel->getPackage());
+                    $this->packagesWithUninstalledEvents[$eventModel->getPackage()] = true;
+                }
                 $this->installEvent($eventModel);
                 break;
             case EventTypeRegistry::EVENT_TYPE_INSTALL:
